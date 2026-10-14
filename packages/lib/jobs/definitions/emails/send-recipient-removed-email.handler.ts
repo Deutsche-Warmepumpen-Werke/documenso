@@ -80,6 +80,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientRemovedEmail
     documentName: envelope.title,
     inviterName: inviterName || undefined,
     assetBaseUrl,
+    recipientName: recipientName || undefined,
   });
 
   const i18n = await getI18nInstance(emailLanguage);

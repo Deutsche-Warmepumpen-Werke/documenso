@@ -175,7 +175,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
       organisationType === OrganisationType.ORGANISATION ? team?.teamEmail?.email || user.email : user.email,
     assetBaseUrl,
     signDocumentLink,
-    customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
+    customBody: customEmail?.message ? renderCustomEmailTemplate(customEmail.message, customEmailTemplate) : undefined,
     role: recipient.role,
     selfSigner,
     organisationType,
@@ -183,6 +183,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,
     reportUrl,
+    recipientName: name || undefined,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {

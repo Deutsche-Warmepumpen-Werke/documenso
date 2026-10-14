@@ -73,6 +73,7 @@ export const run = async ({ payload }: { payload: TSendDocumentPendingEmailJobDe
   const template = createElement(DocumentPendingEmailTemplate, {
     documentName: envelope.title,
     assetBaseUrl,
+    recipientName: name || undefined,
   });
 
   const [html, text] = await Promise.all([

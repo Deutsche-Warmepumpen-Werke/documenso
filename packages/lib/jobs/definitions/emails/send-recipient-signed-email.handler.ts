@@ -92,6 +92,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
     recipientName,
     recipientEmail,
     assetBaseUrl,
+    ownerName: owner.name || undefined,
   });
 
   await io.runTask('send-recipient-signed-email', async () => {

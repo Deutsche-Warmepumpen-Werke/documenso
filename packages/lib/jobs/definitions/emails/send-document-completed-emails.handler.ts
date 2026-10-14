@@ -125,6 +125,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       documentName: envelope.title,
       assetBaseUrl,
       downloadLink: documentOwnerDownloadLink,
+      recipientName: owner.name || undefined,
     });
 
     const [html, text] = await Promise.all([
@@ -217,6 +218,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
         documentName: envelope.title,
         assetBaseUrl,
         downloadLink: recipient.email === owner.email ? documentOwnerDownloadLink : downloadLink,
+        recipientName: recipient.name || undefined,
         customBody:
           isDirectTemplate && envelope.documentMeta?.message
             ? renderCustomEmailTemplate(envelope.documentMeta.message, customEmailTemplate)

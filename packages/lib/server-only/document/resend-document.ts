@@ -257,13 +257,16 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
             : user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
+        customBody: envelope.documentMeta.message
+          ? renderCustomEmailTemplate(envelope.documentMeta.message, customEmailTemplate)
+          : undefined,
         role: recipient.role,
         selfSigner,
         organisationType,
         teamName: envelope.team?.name,
         includeSenderDetails: settings.includeSenderDetails,
         reportUrl,
+        recipientName: recipient.name || undefined,
       });
 
       const [html, text] = await Promise.all([

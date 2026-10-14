@@ -119,6 +119,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
       documentUrl: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(envelope.team?.url)}/${envelope.id}`,
       rejectionReason: recipient.rejectionReason || '',
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+      ownerName: documentOwner.name || undefined,
     });
 
     const [html, text] = await Promise.all([

@@ -1,76 +1,69 @@
 import { Trans } from '@lingui/react/macro';
-import { Fragment } from 'react';
 
 import { Link, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
-import { getSafeBrandingUrl } from '../utils/branding-url';
+import { DWW_COLOR, DWW_FONT, DWW_PROFILE } from '../dww';
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
   reportUrl?: string;
 };
 
-export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterProps) => {
-  const branding = useBranding();
+const SEPARATOR = '  ·  ';
 
-  const safeBrandingUrl = branding.brandingEnabled ? getSafeBrandingUrl(branding.brandingUrl) : null;
+const mutedLink = { color: DWW_COLOR.muted, textDecoration: 'none' } as const;
 
-  return (
-    <Section>
-      {reportUrl && (
-        <Text className="my-4 text-base text-muted-foreground">
-          <Trans>
-            Did not expect this email?{' '}
-            <Link className="text-primary" href={reportUrl}>
-              Click here to report the sender
-            </Link>
-            . Never sign a document you don't recognize or weren't expecting.
-          </Trans>
-        </Text>
-      )}
-
-      {isDocument && !branding.brandingHidePoweredBy && (
-        <Text className="my-4 text-base text-muted-foreground">
-          <Trans>
-            This document was sent using{' '}
-            <Link className="text-primary" href="https://documen.so/mail-footer">
-              Documenso
-            </Link>
-            .
-          </Trans>
-        </Text>
-      )}
-
-      {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-muted-foreground text-sm">
-          {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
-            return (
-              <Fragment key={idx}>
-                {idx > 0 && <br />}
-                {line}
-              </Fragment>
-            );
-          })}
-        </Text>
-      )}
-
-      {branding.brandingEnabled && safeBrandingUrl && (
-        <Text className="my-8 text-muted-foreground text-sm">
-          <Link href={safeBrandingUrl} target="_blank">
-            {safeBrandingUrl}
+export const TemplateFooter = ({ reportUrl }: TemplateFooterProps) => (
+  <Section>
+    {reportUrl && (
+      <Text className="mt-8 mb-0 text-[13px] leading-5" style={{ color: DWW_COLOR.muted, fontFamily: DWW_FONT }}>
+        <Trans>
+          Did not expect this email?{' '}
+          <Link href={reportUrl} style={{ color: DWW_COLOR.brand, textDecoration: 'none' }}>
+            Click here to report the sender
           </Link>
-        </Text>
-      )}
+          . Never sign a document you don't recognize or weren't expecting.
+        </Trans>
+      </Text>
+    )}
 
-      {!branding.brandingEnabled && (
-        <Text className="my-8 text-muted-foreground text-sm">
-          Documenso, Inc.
-          <br />
-          2261 Market Street, #5211, San Francisco, CA 94114, USA
-        </Text>
-      )}
+    <Section className="mt-9">
+      <div style={{ height: 2, lineHeight: '2px', fontSize: 0, backgroundColor: DWW_COLOR.brand }}>&nbsp;</div>
+
+      <Text
+        className="m-0 mt-[18px] font-semibold text-[13px] leading-5"
+        style={{ color: DWW_COLOR.ink, fontFamily: DWW_FONT }}
+      >
+        {DWW_PROFILE.legalName}
+      </Text>
+
+      <Text className="m-0 mt-0.5 text-[12px] leading-[19px]" style={{ color: DWW_COLOR.muted, fontFamily: DWW_FONT }}>
+        {DWW_PROFILE.address}
+        {DWW_PROFILE.contact.map((item) => (
+          <span key={item.href}>
+            {SEPARATOR}
+            <Link href={item.href} style={{ color: DWW_COLOR.brand, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              {item.label}
+            </Link>
+          </span>
+        ))}
+      </Text>
+
+      <Text className="m-0 mt-2.5 text-[11px] leading-[17px]" style={{ color: DWW_COLOR.muted, fontFamily: DWW_FONT }}>
+        {DWW_PROFILE.legal.join(' · ')} ·{' '}
+        <Link href={DWW_PROFILE.imprint} style={mutedLink}>
+          Impressum
+        </Link>{' '}
+        ·{' '}
+        <Link href={DWW_PROFILE.privacy} style={mutedLink}>
+          Datenschutz
+        </Link>{' '}
+        ·{' '}
+        <Link href={DWW_PROFILE.source} style={mutedLink}>
+          Quellcode
+        </Link>
+      </Text>
     </Section>
-  );
-};
+  </Section>
+);
 
 export default TemplateFooter;

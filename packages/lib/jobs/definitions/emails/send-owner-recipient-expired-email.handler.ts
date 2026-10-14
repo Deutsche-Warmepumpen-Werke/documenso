@@ -85,6 +85,7 @@ export const run = async ({ payload, io }: { payload: TSendOwnerRecipientExpired
     recipientEmail: recipient.email,
     documentLink,
     assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    ownerName: documentOwner.name || undefined,
   });
 
   await io.runTask('send-owner-recipient-expired-email', async () => {

@@ -128,6 +128,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
         const template = createElement(DocumentCancelTemplate, {
           documentName: envelope.title,
           inviterName: documentOwner.name || undefined,
+          recipientName: recipient.name || undefined,
           inviterEmail: documentOwner.email,
           assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
           cancellationReason: cancellationReason || 'The document has been cancelled.',

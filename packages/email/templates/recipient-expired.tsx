@@ -1,55 +1,31 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-
-import { Body, Container, Head, Hr, Html, Preview, Section } from '../components';
-import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
-import { TemplateFooter } from '../template-components/template-footer';
+import { Letter, Paragraph } from '../dww-letter';
 import type { TemplateRecipientExpiredProps } from '../template-components/template-recipient-expired';
-import { TemplateRecipientExpired } from '../template-components/template-recipient-expired';
 
-export type RecipientExpiredEmailTemplateProps = Partial<TemplateRecipientExpiredProps>;
+export type RecipientExpiredEmailTemplateProps = Partial<TemplateRecipientExpiredProps> & {
+  ownerName?: string;
+};
 
 export const RecipientExpiredTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   recipientName = 'John Doe',
   recipientEmail = 'john@example.com',
   documentLink = 'https://documenso.com',
-  assetBaseUrl = 'http://localhost:3002',
+  ownerName,
 }: RecipientExpiredEmailTemplateProps) => {
-  const { _ } = useLingui();
-
-  const previewText = msg`The signing window for "${recipientName}" on document "${documentName}" has expired.`;
+  const recipient = recipientName ? `${recipientName} (${recipientEmail})` : recipientEmail;
 
   return (
-    <Html>
-      <Head />
-
-      <Body className="mx-auto my-auto bg-background font-sans">
-        <Preview>{_(previewText)}</Preview>
-
-        <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
-            <Section>
-              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
-
-              <TemplateRecipientExpired
-                documentName={documentName}
-                recipientName={recipientName}
-                recipientEmail={recipientEmail}
-                documentLink={documentLink}
-                assetBaseUrl={assetBaseUrl}
-              />
-            </Section>
-          </Container>
-
-          <Hr className="mx-auto mt-12 max-w-xl" />
-
-          <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
-          </Container>
-        </Section>
-      </Body>
-    </Html>
+    <Letter
+      heading="Frist abgelaufen"
+      preview={`${recipient} hat „${documentName}“ nicht rechtzeitig bearbeitet.`}
+      recipientName={ownerName}
+      action={{ href: documentLink, label: 'Dokument öffnen' }}
+    >
+      <Paragraph>
+        die Frist für {recipient} zum Dokument „{documentName}“ ist abgelaufen. Sie können das Dokument erneut senden
+        oder den Empfänger ändern.
+      </Paragraph>
+    </Letter>
   );
 };
 

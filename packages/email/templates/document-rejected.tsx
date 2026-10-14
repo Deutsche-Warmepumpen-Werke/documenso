@@ -1,10 +1,4 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-
-import { Body, Container, Head, Html, Preview, Section } from '../components';
-import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
-import { TemplateDocumentRejected } from '../template-components/template-document-rejected';
-import { TemplateFooter } from '../template-components/template-footer';
+import { Letter, Paragraph, Quote } from '../dww-letter';
 
 type DocumentRejectedEmailProps = {
   recipientName: string;
@@ -12,6 +6,7 @@ type DocumentRejectedEmailProps = {
   documentUrl: string;
   rejectionReason: string;
   assetBaseUrl?: string;
+  ownerName?: string;
 };
 
 export function DocumentRejectedEmail({
@@ -19,39 +14,20 @@ export function DocumentRejectedEmail({
   documentName,
   documentUrl,
   rejectionReason,
-  assetBaseUrl = 'http://localhost:3002',
+  ownerName,
 }: DocumentRejectedEmailProps) {
-  const { _ } = useLingui();
-
-  const previewText = _(msg`${recipientName} has rejected the document '${documentName}'`);
-
   return (
-    <Html>
-      <Head />
-
-      <Body className="mx-auto my-auto bg-background font-sans">
-        <Preview>{previewText}</Preview>
-
-        <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
-            <Section>
-              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
-
-              <TemplateDocumentRejected
-                recipientName={recipientName}
-                documentName={documentName}
-                documentUrl={documentUrl}
-                rejectionReason={rejectionReason}
-              />
-            </Section>
-          </Container>
-
-          <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
-          </Container>
-        </Section>
-      </Body>
-    </Html>
+    <Letter
+      heading="Dokument abgelehnt"
+      preview={`${recipientName} hat „${documentName}“ abgelehnt.`}
+      recipientName={ownerName}
+      action={{ href: documentUrl, label: 'Dokument öffnen' }}
+    >
+      <Paragraph>
+        {recipientName} hat das Dokument „{documentName}“ abgelehnt.
+      </Paragraph>
+      {rejectionReason && <Quote>{rejectionReason.trim()}</Quote>}
+    </Letter>
   );
 }
 

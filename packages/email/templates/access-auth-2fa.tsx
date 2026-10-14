@@ -1,10 +1,4 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-
-import { Body, Container, Head, Html, Preview, Section } from '../components';
-import { TemplateAccessAuth2FA } from '../template-components/template-access-auth-2fa';
-import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
-import { TemplateFooter } from '../template-components/template-footer';
+import { Code, Letter, Paragraph } from '../dww-letter';
 
 export type AccessAuth2FAEmailTemplateProps = {
   documentTitle: string;
@@ -18,47 +12,19 @@ export type AccessAuth2FAEmailTemplateProps = {
 export const AccessAuth2FAEmailTemplate = ({
   documentTitle,
   code,
-  userEmail,
   userName,
   expiresInMinutes,
-  assetBaseUrl = 'http://localhost:3002',
-}: AccessAuth2FAEmailTemplateProps) => {
-  const { _ } = useLingui();
-
-  const previewText = msg`Your verification code is ${code}`;
-
-  return (
-    <Html>
-      <Head />
-
-      <Body className="mx-auto my-auto bg-background font-sans">
-        <Preview>{_(previewText)}</Preview>
-
-        <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
-            <Section>
-              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
-
-              <TemplateAccessAuth2FA
-                documentTitle={documentTitle}
-                code={code}
-                userEmail={userEmail}
-                userName={userName}
-                expiresInMinutes={expiresInMinutes}
-                assetBaseUrl={assetBaseUrl}
-              />
-            </Section>
-          </Container>
-
-          <div className="mx-auto mt-12 max-w-xl" />
-
-          <Container className="mx-auto max-w-xl">
-            <TemplateFooter isDocument={false} />
-          </Container>
-        </Section>
-      </Body>
-    </Html>
-  );
-};
+}: AccessAuth2FAEmailTemplateProps) => (
+  <Letter
+    heading="Ihr Bestätigungscode"
+    preview={`Ihr Code für „${documentTitle}“: ${code}`}
+    recipientName={userName}
+    note="Sie haben keinen Code angefordert? Dann können Sie diese E-Mail ignorieren."
+  >
+    <Paragraph>mit diesem Code öffnen Sie das Dokument „{documentTitle}“:</Paragraph>
+    <Code>{code}</Code>
+    <Paragraph>Der Code ist {expiresInMinutes} Minuten gültig.</Paragraph>
+  </Letter>
+);
 
 export default AccessAuth2FAEmailTemplate;

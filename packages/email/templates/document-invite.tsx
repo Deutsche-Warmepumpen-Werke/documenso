@@ -1,16 +1,7 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { RecipientRole } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType, RecipientRole } from '@prisma/client';
 
-import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from '../components';
-import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
-import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
+import { Letter, Paragraph, Quote } from '../dww-letter';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
-import { TemplateDocumentInvite } from '../template-components/template-document-invite';
-import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
@@ -21,14 +12,62 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   includeSenderDetails?: boolean;
   organisationType?: OrganisationType;
   reportUrl?: string;
+  recipientName?: string;
+};
+
+export const INVITE_COPY = {
+  [RecipientRole.SIGNER]: {
+    heading: 'Dokument unterschreiben',
+    verb: 'zu unterschreiben',
+    detail: 'Über den folgenden Link sehen Sie das Dokument, prüfen es und unterschreiben digital.',
+    action: 'Dokument ansehen und unterschreiben',
+  },
+  [RecipientRole.APPROVER]: {
+    heading: 'Dokument freigeben',
+    verb: 'freizugeben',
+    detail: 'Über den folgenden Link sehen Sie das Dokument, prüfen es und geben es frei.',
+    action: 'Dokument prüfen und freigeben',
+  },
+  [RecipientRole.VIEWER]: {
+    heading: 'Dokument ansehen',
+    verb: 'anzusehen',
+    detail: 'Über den folgenden Link öffnen Sie das Dokument.',
+    action: 'Dokument ansehen',
+  },
+  [RecipientRole.ASSISTANT]: {
+    heading: 'Dokument vorbereiten',
+    verb: 'vorzubereiten',
+    detail: 'Über den folgenden Link öffnen Sie das Dokument und füllen die vorgesehenen Felder aus.',
+    action: 'Dokument öffnen',
+  },
+  [RecipientRole.CC]: {
+    heading: 'Dokument zur Kenntnis',
+    verb: 'zur Kenntnis zu nehmen',
+    detail: 'Über den folgenden Link öffnen Sie das Dokument.',
+    action: 'Dokument ansehen',
+  },
+} as const satisfies Record<RecipientRole, { heading: string; verb: string; detail: string; action: string }>;
+
+const senderOf = ({
+  inviterName,
+  teamName,
+  organisationType,
+  includeSenderDetails,
+}: Pick<
+  DocumentInviteEmailTemplateProps,
+  'inviterName' | 'teamName' | 'organisationType' | 'includeSenderDetails'
+>) => {
+  if (organisationType === OrganisationType.ORGANISATION && teamName) {
+    return includeSenderDetails && inviterName ? `${inviterName} (${teamName})` : teamName;
+  }
+
+  return inviterName || 'Die Deutschen Wärmepumpen Werke';
 };
 
 export const DocumentInviteEmailTemplate = ({
   inviterName = 'Lucas Smith',
-  inviterEmail = 'lucas@documenso.com',
   documentName = 'Open Source Pledge.pdf',
   signDocumentLink = 'https://documenso.com',
-  assetBaseUrl = 'http://localhost:3002',
   customBody,
   role,
   selfSigner = false,
@@ -36,83 +75,28 @@ export const DocumentInviteEmailTemplate = ({
   includeSenderDetails,
   organisationType,
   reportUrl,
+  recipientName,
 }: DocumentInviteEmailTemplateProps) => {
-  const { _ } = useLingui();
+  const copy = INVITE_COPY[role];
+  const sender = senderOf({ inviterName, teamName, organisationType, includeSenderDetails });
 
-  const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
-
-  let previewText = msg`${inviterName} has invited you to ${action} ${documentName}`;
-
-  if (organisationType === OrganisationType.ORGANISATION) {
-    previewText = includeSenderDetails
-      ? msg`${inviterName} on behalf of "${teamName}" has invited you to ${action} ${documentName}`
-      : msg`${teamName} has invited you to ${action} ${documentName}`;
-  }
-
-  if (selfSigner) {
-    previewText = msg`Please ${action} your document ${documentName}`;
-  }
+  const intro = selfSigner
+    ? `Sie haben das Dokument „${documentName}“ erstellt. Bitte schließen Sie es noch ab.`
+    : `${sender} bittet Sie, das Dokument „${documentName}“ ${copy.verb}.`;
 
   return (
-    <Html>
-      <Head />
-
-      <Body className="mx-auto my-auto bg-background font-sans">
-        <Preview>{_(previewText)}</Preview>
-
-        <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
-            <Section>
-              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
-
-              <TemplateDocumentInvite
-                inviterName={inviterName}
-                inviterEmail={inviterEmail}
-                documentName={documentName}
-                signDocumentLink={signDocumentLink}
-                assetBaseUrl={assetBaseUrl}
-                role={role}
-                selfSigner={selfSigner}
-                organisationType={organisationType}
-                teamName={teamName}
-                includeSenderDetails={includeSenderDetails}
-              />
-            </Section>
-          </Container>
-
-          <Container className="mx-auto mt-12 max-w-xl">
-            <Section>
-              {organisationType === OrganisationType.PERSONAL && (
-                <Text className="my-4 font-semibold text-base">
-                  <Trans>
-                    {inviterName}{' '}
-                    <Link className="font-normal text-muted-foreground" href={`mailto:${inviterEmail}`}>
-                      ({inviterEmail})
-                    </Link>
-                  </Trans>
-                </Text>
-              )}
-
-              <Text className="mt-2 text-base text-muted-foreground">
-                {customBody ? (
-                  <TemplateCustomMessageBody text={customBody} />
-                ) : (
-                  <Trans>
-                    {inviterName} has invited you to {action} the document "{documentName}".
-                  </Trans>
-                )}
-              </Text>
-            </Section>
-          </Container>
-
-          <Hr className="mx-auto mt-12 max-w-xl" />
-
-          <Container className="mx-auto max-w-xl">
-            <TemplateFooter reportUrl={reportUrl} />
-          </Container>
-        </Section>
-      </Body>
-    </Html>
+    <Letter
+      heading={copy.heading}
+      preview={intro}
+      recipientName={recipientName}
+      action={{ href: signDocumentLink, label: copy.action }}
+      note={role === RecipientRole.SIGNER ? 'Für die digitale Unterschrift brauchen Sie kein Konto.' : undefined}
+      reportUrl={reportUrl}
+    >
+      <Paragraph>{intro}</Paragraph>
+      {customBody && <Quote>{customBody.trim()}</Quote>}
+      <Paragraph>{copy.detail}</Paragraph>
+    </Letter>
   );
 };
 
