@@ -4,7 +4,11 @@
 FROM node:24-alpine3.23 AS base
 
 RUN apk add --no-cache openssl
-RUN apk add --no-cache font-freefont
+RUN apk add --no-cache font-freefont fontconfig
+
+# Urbanist (SIL OFL 1.1) from github.com/google/fonts, ofl/urbanist
+COPY docker/fonts/urbanist /usr/share/fonts/urbanist
+RUN fc-cache -f
 
 
 ###########################
