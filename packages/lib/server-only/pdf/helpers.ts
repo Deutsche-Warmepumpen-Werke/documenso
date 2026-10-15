@@ -28,6 +28,13 @@ export const ensureFontLibrary = () => {
     });
   }
 
+  if (!FontLibrary.has('Urbanist')) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    FontLibrary.use({
+      ['Urbanist']: [path.join(fontPath, 'urbanist.ttf')],
+    });
+  }
+
   if (!FontLibrary.has('Noto Sans')) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({

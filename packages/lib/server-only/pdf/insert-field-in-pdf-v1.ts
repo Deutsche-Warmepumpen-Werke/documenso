@@ -28,9 +28,9 @@ import {
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const [fontCaveat, fontNoto] = await Promise.all([
+  const [fontCaveat, fontUrbanist] = await Promise.all([
     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/urbanist.ttf`).then(async (res) => res.arrayBuffer()),
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
@@ -115,7 +115,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
   }
 
   const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? fontCaveat : fontUrbanist,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
 
